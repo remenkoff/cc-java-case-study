@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CodecastPresentation {
-  private PresentCodeCastUseCase useCase = new PresentCodeCastUseCase();
-  private Gatekeeper gatekeeper = new Gatekeeper();
+  private PresentCodecastUseCase useCase = new PresentCodecastUseCase();
+  public static Gatekeeper gatekeeper = new Gatekeeper();
 
   public CodecastPresentation() {
     Context.gateway = new MockGateway();
@@ -47,7 +47,7 @@ public class CodecastPresentation {
 
   public boolean clearCodecasts() {
     List<Codecast> codecasts = Context.gateway.findAllCodecasts();
-    for (Codecast codecast: new ArrayList<Codecast>(codecasts)) {
+    for (Codecast codecast: new ArrayList<>(codecasts)) {
       Context.gateway.delete(codecast);
     }
     return Context.gateway.findAllCodecasts().size() == 0;

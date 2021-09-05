@@ -1,4 +1,4 @@
 package javacasestudy;
 
-public class PresentableCodecast {
+public record PresentableCodecast(String title, String publicationDate, boolean isViewable) {
 }

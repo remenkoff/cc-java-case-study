@@ -8,4 +8,12 @@ public class License {
     this.user = user;
     this.codecast = codecast;
   }
+
+  public User getUser() {
+    return user;
+  }
+
+  public Codecast getCodecast() {
+    return codecast;
+  }
 }

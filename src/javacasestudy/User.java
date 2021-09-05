@@ -1,7 +1,7 @@
 package javacasestudy;
 
-public class User {
-  private String username;
+public class User extends Entity {
+  private final String username;
 
   public User(String username) {
     this.username = username;

@@ -12,4 +12,6 @@ public interface Gateway {
   void save(User user);
 
   void save(License license);
+  List<License> findLicensesForUserAndCodecast(User user, Codecast codecast);
+  List<License> findLicensesFor(User user);
 }
