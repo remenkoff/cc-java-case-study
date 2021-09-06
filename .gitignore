@@ -4,8 +4,9 @@ FitNesseRoot/files
 FitNesseRoot/ErrorLogs
 FitNesseRoot/FitNesse
 FitNesseRoot/RecentChanges
+FitNesseRoot/RerunLastFailures*
 out
-cleancoderscom.iml
+javacasestudy.iml
 fitnesse-standalone.jar
 target
 *camtasia
