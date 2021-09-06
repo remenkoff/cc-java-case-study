@@ -1,8 +1,8 @@
 package javacasestudy;
 
 public class Codecast extends Entity {
-  private String title;
-  private String publicationDate;
+  private final String title;
+  private final String publicationDate;
 
   public Codecast(String title, String publicationDate) {
     this.title = title;

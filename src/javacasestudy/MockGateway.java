@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class MockGateway implements Gateway {
-  private List<Codecast> codecasts;
-  private List<User> users;
-  private List<License> licenses;
+  private final List<Codecast> codecasts;
+  private final List<User> users;
+  private final List<License> licenses;
 
   public MockGateway() {
     codecasts = new ArrayList<>();

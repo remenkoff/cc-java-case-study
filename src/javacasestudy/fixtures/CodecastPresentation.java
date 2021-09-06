@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CodecastPresentation {
-  private PresentCodecastUseCase useCase = new PresentCodecastUseCase();
+  private final PresentCodecastUseCase useCase = new PresentCodecastUseCase();
   public static Gatekeeper gatekeeper = new Gatekeeper();
 
   public CodecastPresentation() {
@@ -53,7 +53,7 @@ public class CodecastPresentation {
     return Context.gateway.findAllCodecasts().size() == 0;
   }
 
-  public int numberOfCodecastPresented() {
+  public int numberOfCodecastsPresented() {
     List<PresentableCodecast> presentations = useCase.presentCodecasts(gatekeeper.getLoggedInUser());
     return presentations.size();
   }
