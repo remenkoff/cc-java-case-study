@@ -1,10 +1,12 @@
 package javacasestudy;
 
+import java.util.Date;
+
 public class Codecast extends Entity {
   private final String title;
-  private final String publicationDate;
+  private final Date publicationDate;
 
-  public Codecast(String title, String publicationDate) {
+  public Codecast(String title, Date publicationDate) {
     this.title = title;
     this.publicationDate = publicationDate;
   }
@@ -13,7 +15,7 @@ public class Codecast extends Entity {
     return title;
   }
 
-  public String getPublicationDate() {
+  public Date getPublicationDate() {
     return publicationDate;
   }
 }

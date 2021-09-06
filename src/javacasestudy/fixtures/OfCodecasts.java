@@ -26,7 +26,7 @@ public class OfCodecasts {
         pcc.title(),
         pcc.title(),
         pcc.isViewable(),
-        false
+        pcc.isDownloadable()
       );
       queryResponse.add(row);
     }

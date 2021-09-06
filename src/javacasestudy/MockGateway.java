@@ -1,8 +1,6 @@
 package javacasestudy;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
 
 public class MockGateway implements Gateway {
   private final List<Codecast> codecasts;
@@ -15,9 +13,10 @@ public class MockGateway implements Gateway {
     licenses = new ArrayList<>();
   }
 
-  @Override
-  public List<Codecast> findAllCodecasts() {
-    return codecasts;
+  public List<Codecast> findAllCodecastsChronoSorted() {
+    List<Codecast> sortedCodecasts = new ArrayList<>(codecasts);
+    sortedCodecasts.sort(Comparator.comparing(Codecast::getPublicationDate));
+    return sortedCodecasts;
   }
 
   @Override

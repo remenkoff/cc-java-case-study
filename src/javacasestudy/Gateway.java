@@ -3,7 +3,7 @@ package javacasestudy;
 import java.util.List;
 
 public interface Gateway {
-  List<Codecast> findAllCodecasts();
+  List<Codecast> findAllCodecastsChronoSorted();
   Codecast findCodecast(String title);
   void save(Codecast codecast);
   void delete(Codecast codecast);

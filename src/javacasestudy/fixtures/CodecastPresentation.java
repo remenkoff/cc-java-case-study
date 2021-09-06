@@ -21,24 +21,27 @@ public class CodecastPresentation {
 
   public boolean loginUser(String username) {
     User user = Context.gateway.findUser(username);
-    if (user != null) {
-      gatekeeper.setLoggedInUser(user);
-      return true;
-    } else {
+    if (user == null) {
       return false;
     }
+    gatekeeper.setLoggedInUser(user);
+    return true;
   }
 
   public boolean createLicenseForViewing(String username, String codecastTitle) {
-    User user = Context.gateway.findUser(username);
-    Codecast codecast = Context.gateway.findCodecast(codecastTitle);
-    License license = new License(user, codecast);
-    Context.gateway.save(license);
-    return useCase.isLicensedToViewCodecast(user, codecast);
+    return createLicenseFor(License.Type.VIEWING, username, codecastTitle);
   }
 
   public boolean createLicenseForDownloading(String username, String codecastTitle) {
-    return false;
+    return createLicenseFor(License.Type.DOWNLOADING, username, codecastTitle);
+  }
+
+  private boolean createLicenseFor(License.Type type, String username, String codecastTitle) {
+    User user = Context.gateway.findUser(username);
+    Codecast codecast = Context.gateway.findCodecast(codecastTitle);
+    License license = new License(type, user, codecast);
+    Context.gateway.save(license);
+    return useCase.isLicensedTo(type, user, codecast);
   }
 
   public String presentationUser() {
@@ -46,15 +49,14 @@ public class CodecastPresentation {
   }
 
   public boolean clearCodecasts() {
-    List<Codecast> codecasts = Context.gateway.findAllCodecasts();
-    for (Codecast codecast: new ArrayList<>(codecasts)) {
+    List<Codecast> codecasts = Context.gateway.findAllCodecastsChronoSorted();
+    for (Codecast codecast : new ArrayList<>(codecasts)) {
       Context.gateway.delete(codecast);
     }
-    return Context.gateway.findAllCodecasts().size() == 0;
+    return Context.gateway.findAllCodecastsChronoSorted().size() == 0;
   }
 
   public int numberOfCodecastsPresented() {
-    List<PresentableCodecast> presentations = useCase.presentCodecasts(gatekeeper.getLoggedInUser());
-    return presentations.size();
+    return useCase.presentCodecasts(gatekeeper.getLoggedInUser()).size();
   }
 }
