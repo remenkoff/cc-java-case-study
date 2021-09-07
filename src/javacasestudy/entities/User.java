@@ -1,4 +1,4 @@
-package javacasestudy;
+package javacasestudy.entities;
 
 public class User extends Entity {
   private final String username;

@@ -1,4 +1,4 @@
-package javacasestudy;
+package javacasestudy.entities;
 
 import java.util.Date;
 

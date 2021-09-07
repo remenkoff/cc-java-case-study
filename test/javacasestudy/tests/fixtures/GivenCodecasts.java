@@ -1,6 +1,6 @@
-package javacasestudy.fixtures;
+package javacasestudy.tests.fixtures;
 
-import javacasestudy.Codecast;
+import javacasestudy.entities.Codecast;
 import javacasestudy.Context;
 
 import java.text.ParseException;
@@ -24,6 +24,6 @@ public class GivenCodecasts {
 
   public void execute() {
     Codecast codecast = new Codecast(title, publicationDate);
-    Context.gateway.save(codecast);
+    Context.codecastGateway.save(codecast);
   }
 }

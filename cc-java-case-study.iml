@@ -5,9 +5,16 @@
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/FitNesseRoot/files" />
       <excludeFolder url="file://$MODULE_DIR$/FitNesseRoot/FitNesse" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/FitNesseRoot/FrontPage" />
+      <excludeFolder url="file://$MODULE_DIR$/FitNesseRoot/PageFooter" />
+      <excludeFolder url="file://$MODULE_DIR$/FitNesseRoot/PageHeader" />
+      <excludeFolder url="file://$MODULE_DIR$/FitNesseRoot/PlugIns" />
+      <excludeFolder url="file://$MODULE_DIR$/FitNesseRoot/TemplateLibrary" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea" />
     </content>
     <orderEntry type="jdk" jdkName="openjdk-16" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />

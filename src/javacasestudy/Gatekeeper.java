@@ -1,5 +1,7 @@
 package javacasestudy;
 
+import javacasestudy.entities.User;
+
 public class Gatekeeper {
   private User loggedInUser;
 

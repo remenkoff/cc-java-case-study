@@ -1,6 +1,11 @@
-package javacasestudy.fixtures;
+package javacasestudy.tests.fixtures;
 
 import javacasestudy.*;
+import javacasestudy.entities.Codecast;
+import javacasestudy.entities.License;
+import javacasestudy.entities.User;
+import javacasestudy.tests.TestSetup;
+import javacasestudy.useCases.presentCodecast.PresentCodecastUseCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,17 +15,17 @@ public class CodecastPresentation {
   public static Gatekeeper gatekeeper = new Gatekeeper();
 
   public CodecastPresentation() {
-    Context.gateway = new MockGateway();
+    new FixtureSetup();
   }
 
   public boolean addUser(String username) {
     User user = new User(username);
-    Context.gateway.save(user);
-    return Context.gateway.findUser(username) != null;
+    Context.userGateway.save(user);
+    return Context.userGateway.findUserByName(username) != null;
   }
 
   public boolean loginUser(String username) {
-    User user = Context.gateway.findUser(username);
+    User user = Context.userGateway.findUserByName(username);
     if (user == null) {
       return false;
     }
@@ -37,10 +42,10 @@ public class CodecastPresentation {
   }
 
   private boolean createLicenseFor(License.Type type, String username, String codecastTitle) {
-    User user = Context.gateway.findUser(username);
-    Codecast codecast = Context.gateway.findCodecast(codecastTitle);
+    User user = Context.userGateway.findUserByName(username);
+    Codecast codecast = Context.codecastGateway.findCodecast(codecastTitle);
     License license = new License(type, user, codecast);
-    Context.gateway.save(license);
+    Context.licenseGateway.save(license);
     return useCase.isLicensedTo(type, user, codecast);
   }
 
@@ -49,11 +54,11 @@ public class CodecastPresentation {
   }
 
   public boolean clearCodecasts() {
-    List<Codecast> codecasts = Context.gateway.findAllCodecastsChronoSorted();
+    List<Codecast> codecasts = Context.codecastGateway.findAllCodecastsChronoSorted();
     for (Codecast codecast : new ArrayList<>(codecasts)) {
-      Context.gateway.delete(codecast);
+      Context.codecastGateway.delete(codecast);
     }
-    return Context.gateway.findAllCodecastsChronoSorted().size() == 0;
+    return Context.codecastGateway.findAllCodecastsChronoSorted().size() == 0;
   }
 
   public int numberOfCodecastsPresented() {

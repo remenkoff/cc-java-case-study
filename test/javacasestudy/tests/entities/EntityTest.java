@@ -1,5 +1,6 @@
-package javacasestudy;
+package javacasestudy.tests.entities;
 
+import javacasestudy.entities.Entity;
 import org.junit.jupiter.api.*;
 
 import java.util.UUID;

@@ -1,6 +1,6 @@
-package javacasestudy;
+package javacasestudy.entities;
 
-public class License {
+public class License extends Entity {
   public enum Type {VIEWING, DOWNLOADING}
 
   private final Type type;

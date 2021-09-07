@@ -1,4 +1,4 @@
-package javacasestudy;
+package javacasestudy.useCases.presentCodecast;
 
 public record PresentableCodecast(
   String title,

@@ -1,8 +1,8 @@
-package javacasestudy.fixtures;
+package javacasestudy.tests.fixtures;
 
-import javacasestudy.PresentCodecastUseCase;
-import javacasestudy.PresentableCodecast;
-import javacasestudy.User;
+import javacasestudy.useCases.presentCodecast.PresentCodecastUseCase;
+import javacasestudy.useCases.presentCodecast.PresentableCodecast;
+import javacasestudy.entities.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;

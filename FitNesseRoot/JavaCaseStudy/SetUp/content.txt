@@ -1,5 +1,5 @@
 |import|
-|javacasestudy.fixtures|
+|javacasestudy.tests.fixtures|
 
 |library|
 |codecast presentation|
