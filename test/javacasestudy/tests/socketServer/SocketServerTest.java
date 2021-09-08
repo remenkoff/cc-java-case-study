@@ -1,67 +1,192 @@
 package javacasestudy.tests.socketServer;
 
-import javacasestudy.socketServer.SocketServer;
-import javacasestudy.socketServer.SocketService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import javacasestudy.socketServer.*;
+import org.junit.jupiter.api.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
-import static javacasestudy.tests.TestUtils.randomIntFromZeroTo;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("SynchronizeOnNonFinalField")
 final public class SocketServerTest {
-  private static final int MAX_PORT_VALUE = 65353;
-  private int port;
-  private SocketService service;
+  private static final String HOST = "localhost";
+  private static final int PORT = 16192;
   private SocketServer server;
 
-  @BeforeEach
-  void setUp() throws IOException {
-    port = randomIntFromZeroTo(MAX_PORT_VALUE);
-    service = new FakeSocketService();
-    server = new SocketServer(port, service);
-  }
-
   @AfterEach
-  void tearDown() {
-    if (server.isRunning())
-      server.stop();
-  }
-
-  @Test
-  public void instantiate() {
-    assertEquals(port, server.getPort());
-    assertEquals(service, server.getService());
-  }
-
-  @Test
-  public void canStartAndStopServer() {
-    server.start(() -> assertTrue(server.isRunning()));
-
+  void tearDown() throws Exception {
     server.stop();
-    assertFalse(server.isRunning());
   }
 
-  @Test
-  public void acceptsAnIncomingConnection() {
-    server.start(() -> assertEquals(1, service.getNumberOfConnections()));
+  @Nested
+  protected class WithClosingSocketService {
+    private static class ClosingSocketService extends TestSocketService {
+      protected int numberOfConnections;
+
+      public int getNumberOfConnections() {
+        return numberOfConnections;
+      }
+
+      protected void handle(Socket socket) {
+        numberOfConnections += 1;
+      }
+    }
+
+    private ClosingSocketService closingService;
+
+    @BeforeEach
+    void setUp() throws Exception {
+      closingService = new ClosingSocketService();
+      server = new SocketServer(PORT, closingService);
+    }
+
+    @Test
+    public void instantiate() {
+      assertEquals(PORT, server.getPort());
+      assertEquals(closingService, server.getSocketService());
+    }
+
+    @Test
+    public void canStartAndStopServer() throws Exception {
+      server.start();
+
+      assertTrue(server.isRunning());
+
+      server.stop();
+
+      assertFalse(server.isRunning());
+    }
+
+    @Test
+    public void acceptsAnIncomingConnection() throws Exception {
+      server.start();
+      new Socket(HOST, PORT);
+      synchronized (closingService) {
+        closingService.wait();
+      }
+      server.stop();
+
+      assertEquals(1, closingService.getNumberOfConnections());
+    }
+
+    @Test
+    public void acceptsMultipleConnections() throws Exception {
+      server.start();
+
+      new Socket(HOST, PORT);
+      synchronized (closingService) {
+        closingService.wait();
+      }
+      new Socket(HOST, PORT);
+      synchronized (closingService) {
+        closingService.wait();
+      }
+      server.stop();
+
+      assertEquals(2, closingService.getNumberOfConnections());
+    }
   }
 
-  private static class FakeSocketService implements SocketService {
-    private int numberOfConnections;
+  @Nested
+  protected class WithReadingSocketService {
+    private static class ReadingSocketService extends TestSocketService {
+      private String message;
 
-    @Override
-    public void serve(Socket socket) throws IOException {
-      numberOfConnections += 1;
-      socket.close();
+      public String getMessage() {
+        return message;
+      }
+
+      @Override
+      protected void handle(Socket socket) throws IOException {
+        InputStream is = socket.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(isr);
+        message = br.readLine();
+      }
     }
 
-    @Override
-    public int getNumberOfConnections() {
-      return numberOfConnections;
+    private ReadingSocketService readingService;
+
+    @BeforeEach
+    void setUp() throws Exception {
+      readingService = new ReadingSocketService();
+      server = new SocketServer(PORT, readingService);
     }
+
+    @Test
+    public void canSendAndReceiveData() throws Exception {
+      String expected = "Knock-knock.";
+      server.start();
+
+      OutputStream os = (new Socket(HOST, PORT)).getOutputStream();
+      os.write(expected.getBytes());
+      os.close();
+      synchronized (readingService) {
+        readingService.wait();
+      }
+      server.stop();
+
+      assertEquals(expected, readingService.getMessage());
+    }
+  }
+
+  @Nested
+  protected class WithWritingSocketService {
+    private static class WritingSocketService extends TestSocketService {
+      private final String message = "Who's There?";
+
+      public String getMessage() {
+        return message;
+      }
+
+      @Override
+      protected void handle(Socket socket) throws IOException {
+        OutputStream os = socket.getOutputStream();
+        os.write(message.getBytes());
+      }
+    }
+
+    private WritingSocketService writingService;
+
+    @BeforeEach
+    void setUp() throws Exception {
+      writingService = new WritingSocketService();
+      server = new SocketServer(PORT, writingService);
+    }
+
+    @Test
+    public void canSendAndReceiveData() throws Exception {
+      server.start();
+
+      Socket socket = new Socket(HOST, PORT);
+      synchronized (writingService) {
+        writingService.wait();
+      }
+      InputStream is = socket.getInputStream();
+      InputStreamReader isr = new InputStreamReader(is);
+      BufferedReader br = new BufferedReader(isr);
+      String expected = br.readLine();
+      server.stop();
+
+      assertEquals(writingService.getMessage(), expected);
+    }
+  }
+
+  private static abstract class TestSocketService implements SocketService {
+    @Override
+    public void serve(Socket socket) {
+      try {
+        handle(socket);
+        synchronized (this) {
+          notify();
+        }
+        socket.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    protected abstract void handle(Socket socket) throws IOException;
   }
 }

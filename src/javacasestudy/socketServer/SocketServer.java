@@ -2,54 +2,61 @@ package javacasestudy.socketServer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class SocketServer {
   private final int port;
-  private final SocketService service;
-  private final ExecutorService executor;
-  private final ServerSocket socket;
+  private final SocketService socketService;
+  private final ServerSocket serverSocket;
+  private final ExecutorService executorService;
   private boolean isRunning;
 
-  public SocketServer(int port, SocketService service) throws IOException {
+  public SocketServer(int port, SocketService socketService) throws IOException {
     this.port = port;
-    this.service = service;
-    executor = Executors.newFixedThreadPool(4);
-    socket = new ServerSocket(port);
+    this.socketService = socketService;
+    serverSocket = new ServerSocket(port);
+    executorService = Executors.newFixedThreadPool(4);
   }
 
   public int getPort() {
     return port;
   }
 
-  public SocketService getService() {
-    return service;
+  public SocketService getSocketService() {
+    return socketService;
   }
 
   public boolean isRunning() {
     return isRunning;
   }
 
-  public void start(AsyncCompletion completion) {
-    executor.execute(() -> {
+  public void start() {
+    executorService.execute(() -> {
       try {
-        service.serve(socket.accept());
-      } catch (IOException e) {
-        if (isRunning)
+        while (isRunning) {
+          final Socket serviceSocket = serverSocket.accept();
+          executorService.execute(() -> socketService.serve(serviceSocket));
+        }
+      } catch (Exception e) {
+        if (isRunning) {
           e.printStackTrace();
+        }
+        System.out.println("SocketServer: stopped by catch");
       }
-      isRunning = true;
-      completion.onComplete();
     });
+
+    isRunning = true;
+    System.out.printf("SocketServer: started on port %s%n", port);
   }
 
-  public void stop() {
-    executor.shutdown();
+  public void stop() throws Exception {
     isRunning = false;
-  }
-
-  public interface AsyncCompletion {
-    void onComplete();
+    serverSocket.close();
+    executorService.shutdown();
+    if (!executorService.awaitTermination(1024, TimeUnit.MILLISECONDS))
+      executorService.shutdownNow();
   }
 }
