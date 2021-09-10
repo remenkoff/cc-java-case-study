@@ -1,11 +1,19 @@
 package javacasestudy.tests.socketServer;
 
-import javacasestudy.socketServer.*;
-import org.junit.jupiter.api.*;
+import javacasestudy.socketServer.SocketServer;
+import javacasestudy.socketServer.SocketService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
 
+import static javacasestudy.tests.TestUtils.randomStringLowercased;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("SynchronizeOnNonFinalField")
@@ -61,11 +69,11 @@ final public class SocketServerTest {
     @Test
     public void acceptsAnIncomingConnection() throws Exception {
       server.start();
+
       new Socket(HOST, PORT);
       synchronized (closingService) {
         closingService.wait();
       }
-      server.stop();
 
       assertEquals(1, closingService.getNumberOfConnections());
     }
@@ -82,7 +90,6 @@ final public class SocketServerTest {
       synchronized (closingService) {
         closingService.wait();
       }
-      server.stop();
 
       assertEquals(2, closingService.getNumberOfConnections());
     }
@@ -99,10 +106,7 @@ final public class SocketServerTest {
 
       @Override
       protected void handle(Socket socket) throws IOException {
-        InputStream is = socket.getInputStream();
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-        message = br.readLine();
+        message = readLineFrom(socket);
       }
     }
 
@@ -115,26 +119,23 @@ final public class SocketServerTest {
     }
 
     @Test
-    public void canSendAndReceiveData() throws Exception {
-      String expected = "Knock-knock.";
+    public void canSendData() throws Exception {
+      String expectedString = randomStringLowercased();
       server.start();
 
-      OutputStream os = (new Socket(HOST, PORT)).getOutputStream();
-      os.write(expected.getBytes());
-      os.close();
+      writeStringTo(new Socket(HOST, PORT), expectedString + "\n");
       synchronized (readingService) {
         readingService.wait();
       }
-      server.stop();
 
-      assertEquals(expected, readingService.getMessage());
+      assertEquals(expectedString, readingService.getMessage());
     }
   }
 
   @Nested
   protected class WithWritingSocketService {
     private static class WritingSocketService extends TestSocketService {
-      private final String message = "Who's There?";
+      private final String message = randomStringLowercased();
 
       public String getMessage() {
         return message;
@@ -142,8 +143,7 @@ final public class SocketServerTest {
 
       @Override
       protected void handle(Socket socket) throws IOException {
-        OutputStream os = socket.getOutputStream();
-        os.write(message.getBytes());
+        writeStringTo(socket, message + "\n");
       }
     }
 
@@ -156,25 +156,47 @@ final public class SocketServerTest {
     }
 
     @Test
-    public void canSendAndReceiveData() throws Exception {
+    public void canReceiveData() throws Exception {
       server.start();
 
       Socket socket = new Socket(HOST, PORT);
       synchronized (writingService) {
         writingService.wait();
       }
-      InputStream is = socket.getInputStream();
-      InputStreamReader isr = new InputStreamReader(is);
-      BufferedReader br = new BufferedReader(isr);
-      String expected = br.readLine();
-      server.stop();
+      String expected = readLineFrom(socket);
 
       assertEquals(writingService.getMessage(), expected);
     }
   }
 
+  @Nested
+  protected class WithEchoSocketService {
+    private static class EchoSocketService extends TestSocketService {
+      @Override
+      public void handle(Socket socket) throws IOException {
+        writeStringTo(socket, readLineFrom(socket));
+      }
+    }
+
+    @BeforeEach
+    void setUp() throws Exception {
+      server = new SocketServer(PORT, new EchoSocketService());
+    }
+
+    @Test
+    public void canEcho() throws Exception {
+      String expectedString = randomStringLowercased();
+      server.start();
+
+      final Socket socket = new Socket(HOST, PORT);
+      writeStringTo(socket, expectedString + "\n");
+      String actualString = readLineFrom(socket);
+
+      assertEquals(expectedString, actualString);
+    }
+  }
+
   private static abstract class TestSocketService implements SocketService {
-    @Override
     public void serve(Socket socket) {
       try {
         handle(socket);
@@ -188,5 +210,15 @@ final public class SocketServerTest {
     }
 
     protected abstract void handle(Socket socket) throws IOException;
+  }
+
+  private static String readLineFrom(Socket socket) throws IOException {
+    return new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine();
+  }
+
+  private static void writeStringTo(Socket socket, String string) throws IOException {
+    OutputStream os = socket.getOutputStream();
+    os.write(string.getBytes());
+    os.flush();
   }
 }
