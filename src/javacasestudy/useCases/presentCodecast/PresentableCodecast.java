@@ -2,7 +2,7 @@ package javacasestudy.useCases.presentCodecast;
 
 public record PresentableCodecast(
   String title,
-  String publicationDate,
+  String pubDate,
   boolean isViewable,
   boolean isDownloadable
 ) {

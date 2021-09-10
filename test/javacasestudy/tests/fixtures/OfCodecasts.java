@@ -22,7 +22,7 @@ public class OfCodecasts {
     for (PresentableCodecast pcc : presentableCodecasts) {
       List<Object> row = makeRow(
         pcc.title(),
-        pcc.publicationDate(),
+        pcc.pubDate(),
         pcc.title(),
         pcc.title(),
         pcc.isViewable(),
@@ -35,14 +35,14 @@ public class OfCodecasts {
 
   private List<Object> makeRow(
     String title,
-    String publicationDate,
+    String pubDate,
     String picture,
     String description,
     boolean isViewable,
     boolean isDownloadable
   ) {
     return list(list("title", title),
-                list("publicationDate", publicationDate),
+                list("pubDate", pubDate),
                 list("picture", picture),
                 list("description", description),
                 list("isViewable", isViewable ? "+" : "-"),

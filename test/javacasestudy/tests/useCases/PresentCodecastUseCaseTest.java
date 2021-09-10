@@ -40,8 +40,8 @@ public class PresentCodecastUseCaseTest {
 
     @BeforeEach
     public void setUp() {
-      Date publicationDate = new GregorianCalendar(2021, Calendar.SEPTEMBER, 6).getTime();
-      codecast = new Codecast(randomStringLowercased(), publicationDate);
+      Date pubDate = new GregorianCalendar(2021, Calendar.SEPTEMBER, 6).getTime();
+      codecast = new Codecast(randomStringLowercased(), pubDate);
       Context.codecastGateway.save(codecast);
     }
 
@@ -54,7 +54,7 @@ public class PresentCodecastUseCaseTest {
       PresentableCodecast presentableCodecast = presentableCodecasts.get(0);
 
       assertEquals(presentableCodecast.title(), codecast.getTitle());
-      assertEquals(presentableCodecast.publicationDate(), "9/06/2021");
+      assertEquals(presentableCodecast.pubDate(), "9/06/2021");
     }
 
     @Nested

@@ -22,22 +22,25 @@ public class TestSetup {
   }
 
   public static void setupData() {
-    User crowley = new User("Mr. Crowley");
-    User mason = new User("Perry Mason");
+    User ozzy = new User("Ozzy");
+    Context.userGateway.save(ozzy);
+
+    User perry = new User("Perry");
+    Context.userGateway.save(perry);
 
     Codecast episode1 = new Codecast("Episode 1 — A New Beginning", new Date());
-    Codecast episode2 = new Codecast("Episode 2 — Great Debate",
-                                     new Date(episode1.getPublicationDate().getTime() + 1)
-    );
-
-    License crowleyLicense1 = new License(VIEWING, crowley, episode1);
-    License crowleyLicense2 = new License(VIEWING, crowley, episode2);
-
-    Context.userGateway.save(crowley);
-    Context.userGateway.save(mason);
     Context.codecastGateway.save(episode1);
+
+    Codecast episode2 = new Codecast(
+      "Episode 2 — Great Debate",
+      new Date(episode1.getPubDate().getTime() + 1)
+    );
     Context.codecastGateway.save(episode2);
+
+    License crowleyLicense1 = new License(VIEWING, ozzy, episode1);
     Context.licenseGateway.save(crowleyLicense1);
+
+    License crowleyLicense2 = new License(VIEWING, ozzy, episode2);
     Context.licenseGateway.save(crowleyLicense2);
   }
 }

@@ -11,19 +11,19 @@ public class GivenCodecasts {
   private static final String FIT_NESSE_DATE_FORMAT = "M/d/yyyy";
 
   private String title;
-  private Date publicationDate;
+  private Date pubDate;
 
   public void setTitle(String title) {
     this.title = title;
   }
 
-  public void setPublicationDate(String publicationDateString) throws ParseException {
+  public void setPubDate(String pubDateString) throws ParseException {
     SimpleDateFormat formatter = new SimpleDateFormat(FIT_NESSE_DATE_FORMAT);
-    this.publicationDate = formatter.parse(publicationDateString);
+    this.pubDate = formatter.parse(pubDateString);
   }
 
   public void execute() {
-    Codecast codecast = new Codecast(title, publicationDate);
+    Codecast codecast = new Codecast(title, pubDate);
     Context.codecastGateway.save(codecast);
   }
 }

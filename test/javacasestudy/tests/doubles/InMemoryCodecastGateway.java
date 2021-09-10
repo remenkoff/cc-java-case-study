@@ -11,7 +11,7 @@ public class InMemoryCodecastGateway extends GatewayUtilities<Codecast> implemen
   @Override
   public List<Codecast> findAllCodecastsChronoSorted() {
     List<Codecast> sortedCodecasts = new ArrayList<>(getEntities());
-    sortedCodecasts.sort(Comparator.comparing(Codecast::getPublicationDate));
+    sortedCodecasts.sort(Comparator.comparing(Codecast::getPubDate));
     return sortedCodecasts;
   }
 

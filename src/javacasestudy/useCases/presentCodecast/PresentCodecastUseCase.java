@@ -18,7 +18,7 @@ public class PresentCodecastUseCase {
     SimpleDateFormat formatter = new SimpleDateFormat(PRESENTABLE_DATE_FORMAT);
     return Context.codecastGateway.findAllCodecastsChronoSorted().stream().map(codecast -> new PresentableCodecast(
       codecast.getTitle(),
-      formatter.format(codecast.getPublicationDate()),
+      formatter.format(codecast.getPubDate()),
       isLicensedToViewCodecast(loggedInUser, codecast),
       isLicensedToDownloadCodecast(loggedInUser, codecast)
     )).collect(Collectors.toList());
